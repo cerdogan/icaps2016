@@ -1,0 +1,3 @@
+Write a c++ program that generates a convex hull inside a feasible region in any dimension and for any number of constraints. (-)
+	Write a matlab program that generates a convex hull inside a feasible region for 2 dimensions. (-)
+		Clean up previous simplicial matlab code. (-)
