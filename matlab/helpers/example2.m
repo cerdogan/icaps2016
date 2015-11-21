@@ -5,7 +5,7 @@
 % @brief Visualizes the second set of inequalities for a challenging ex.
 
 % ------------------------------------------------------------------------
-function [ineqs, lims] = example2 (visualize)
+function [ineqs, ineqFs, lims] = example2 (visualize)
 
   clf
   lims = [-30 30 -30 30];
@@ -22,12 +22,13 @@ function [ineqs, lims] = example2 (visualize)
   ineq3 = -(-(0.2*x1+0.5).^5 + 2*(0.2*x1+0.5).^4 + 3*(0.2*x1+0.5).^2 - x2);
   ineq4 = (-(0.25*x1+0.5).^3-20 - x2);
   ineqs = [ineq1; ineq2; ineq3; ineq4];
-  if(nargin < 1 || not(visualize)), return; end;
   
   % Setup the functions for faster evaluation
   ineqFs = {};
   for i = 1 : numel(ineqs), ineqFs{i} = matlabFunction(ineqs(i)); end;
-  
+
+  if(nargin < 1 || not(visualize)), return; end;
+
   % Plot the inequalities
   vals1 = coeffs(ineq1,x2);
   plot(x,subs(-vals1(1)/vals1(2),x), '-c'); hold on;

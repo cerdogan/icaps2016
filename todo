@@ -1,3 +1,8 @@
 Write a c++ program that generates a convex hull inside a feasible region in any dimension and for any number of constraints. (-)
 	Write a matlab program that generates a convex hull inside a feasible region for 2 dimensions. (-)
 		Clean up previous simplicial matlab code. (-)
+			In the computation of the initial hull, make sure the simplex lives in d-space (e.g. in 2D, all the vertices are not colinear). (+)
+				Make use of condition numbers (although not always perfect results). (+)
+			Print the random number generator in the start of program to debug random phenomena. (+)
+	It takes 3.5 seconds to just compute the initial hull in Matlab for 2 dimensions. Write the code in C++ and compare. (-)
+Finish the paper. (-)
