@@ -22,7 +22,7 @@ function [ineqs, ineqFs, lims] = example2 (visualize)
   ineq3 = -(-(0.2*x1+0.5).^5 + 2*(0.2*x1+0.5).^4 + 3*(0.2*x1+0.5).^2 - x2);
   ineq4 = (-(0.25*x1+0.5).^3-20 - x2);
   ineqs = [ineq1; ineq2; ineq3; ineq4];
-  
+  keyboard
   % Setup the functions for faster evaluation
   ineqFs = {};
   for i = 1 : numel(ineqs), ineqFs{i} = matlabFunction(ineqs(i)); end;
@@ -42,14 +42,16 @@ function [ineqs, ineqFs, lims] = example2 (visualize)
   
   % Perform nonlinear programming to minimize distance to a random point
   % and stay within the feasible spaces of the inequalities
-  maxNum = 1000000;
+  maxNum = 10000;
   num = 0;
+  p_ = 0;
+  n_ = 0;
   for i = 1 : maxNum
     sourcePoint = [(lims(2) - lims(1))*rand + lims(1), (lims(4) - lims(3))*rand + lims(3)];
     [res, ~] = nonlcons(sourcePoint);
     if(sum(res < 0) < 4), continue; end;
     num = num + 1;
-    if(mod(i,25) == 1),pause(0.01); end;
+    %if(mod(i,25) == 1),pause(0.01); end;
   end
   
   V = (lims(2) - lims(1)) * (lims(4) - lims(3)) * (num / maxNum);

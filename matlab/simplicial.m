@@ -295,7 +295,7 @@ function [success, newPoint] = addPointForHull0 (p0, H, C, lims, vis)
 end
 
 % ------------------------------------------------------------------------
-function bool = checkLineSegmentsFeasible (p, H, C, Cf) 
+function bool = checkLineSegmentsFeasible (p, H, C) 
   
   bool = false;
   

@@ -5,4 +5,9 @@ Write a c++ program that generates a convex hull inside a feasible region in any
 				Make use of condition numbers (although not always perfect results). (+)
 			Print the random number generator in the start of program to debug random phenomena. (+)
 	It takes 3.5 seconds to just compute the initial hull in Matlab for 2 dimensions. Write the code in C++ and compare. (-)
+		Ensure that the constraints are encoded correctly by checking the feasible volume through sampling. (+)
+		Use nlopt library to find a feasible value. (+)
+			nlopt failure. Just use sampling for now. (+)
+		Implement your own random number generator (http://tinyurl.com/ney6h9j) to check C++ implementation against the Matlab one. (-)
+	
 Finish the paper. (-)
