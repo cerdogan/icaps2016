@@ -10,7 +10,12 @@ Write a c++ program that generates a convex hull inside a feasible region in any
 			nlopt failure. Just use sampling for now. (+)
 		Implement your own random number generator (http://tinyurl.com/ney6h9j) to check C++ implementation against the Matlab one. (-)
 		Use Levenberg-Marquardt implementation in gtsam to compute line and polynomial intersection. (-)
-	
+			Decided against this. Use the one-dimensional search described in Director's 77 paper. (-)
+	Use the one-dimensional search described in Director's 77 paper in 2D Matlab implementation. (-)
+	Prove to yourself that the distance constraints are locally convex. (+)
+	Cut all checks from matlab implementation.
+
 Finish the paper. (-)
+	Prove that the distance constraints are locally convex. (-)
 	Analyze the complexity of the simplicial approximation with the additional nonlinear checks. (-)
 		Put the analysis in terms of number of variables and the degree of the polynomials.
