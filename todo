@@ -16,6 +16,6 @@ Write a c++ program that generates a convex hull inside a feasible region in any
 	Cut all checks from matlab implementation.
 
 Finish the paper. (-)
-	Prove that the distance constraints are locally convex. (-)
-	Analyze the complexity of the simplicial approximation with the additional nonlinear checks. (-)
-		Put the analysis in terms of number of variables and the degree of the polynomials.
+	Write how the feasibility of constraints is computed.
+	#Analyze the complexity of the simplicial approximation with the additional nonlinear checks. (-)
+	#	Put the analysis in terms of number of variables and the degree of the polynomials.
