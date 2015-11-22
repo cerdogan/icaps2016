@@ -9,5 +9,8 @@ Write a c++ program that generates a convex hull inside a feasible region in any
 		Use nlopt library to find a feasible value. (+)
 			nlopt failure. Just use sampling for now. (+)
 		Implement your own random number generator (http://tinyurl.com/ney6h9j) to check C++ implementation against the Matlab one. (-)
+		Use Levenberg-Marquardt implementation in gtsam to compute line and polynomial intersection. (-)
 	
 Finish the paper. (-)
+	Analyze the complexity of the simplicial approximation with the additional nonlinear checks. (-)
+		Put the analysis in terms of number of variables and the degree of the polynomials.
