@@ -18,12 +18,13 @@ using namespace std;
 #define sq(x) ((x) * (x))
 
 /* ******************************************************************************************** */
-static const int NUM_GEARS = 4;
-vector <double> radii {1.4, 0.5, 1.2, 1.5, 1.2, 0.3}; //, 1.6};
-static const int NUM_STICKS = 2;
-vector <double> lengths {4.0, 8.0}; 
+int H_TYPE = 1;
+static const int NUM_GEARS = 3;
+vector <double> radii {1.4, 0.5, 1.2, 1.5, 1.2, 0.3, 1.2, 1.0, 0.8, 0.9, 1.4}; //, 1.6};
+static const int NUM_STICKS = 3;
+vector <double> lengths {8.0, 5.0}; 
 Vector3d obj0 (0.5, 1.0, 1);
-Vector3d objn (20.0, 2.0, 2);
+Vector3d objn (18.0, 2.0, 2);
 vector <Vector3d> obs { Vector3d(5.0, 1.0, 1.0) };
 Vector2d minP (1.0, -1.0), maxP (objn(0), 3.0);
 
@@ -81,47 +82,6 @@ State initialState () {
 }
 
 /* ******************************************************************************************** */
-void heuristic (State& s) {
-}
-
-/* ******************************************************************************************** */
-State* applyAction (const State& s, Action_& a) {
-
-	// printf("\nApplying '%s'\n", a.s().c_str());
-	assert(!s.check && "Should not reach here");
-
-	// Copy state
-	State* s2 = new State;
-	s2->order = s.order;
-	s2->check = s.check;
-	s2->used = s.used;
-	s2->used_sticks = s.used_sticks;
-	
-	// Make the changes
-	if(a.use >= 0) {
-		assert(!s2->used[a.use]);
-		s2->used[a.use] = true;
-		s2->order.push_back(a.use);
-	}
-	else {
-		int gear_id = (-a.use) % 10;
-		int stick_id = (-a.use) / 10;
-		assert(!s2->used[gear_id]);
-		s2->used[gear_id] = true;
-		s2->used_sticks[stick_id] = true;
-		s2->order.push_back(a.use);
-	}
-	if(a.check) s2->check = true;
-		
-	// Compute heuristic
-	heuristic(*s2);
-	s2->H = s.H+1;
-	s2->d = s.d+1;
-
-	return s2;
-}
-
-/* ******************************************************************************************** */
 void generateActions (const State& s, vector <Action_>& acts) {
 	acts.clear();
 	for(int i = 0; i < NUM_GEARS; i++) {
@@ -174,13 +134,13 @@ Vector2d solveL2Distance (const Vector2d& p0, const Vector2d& p2, double rA, dou
 }
 
 /* ******************************************************************************************** */
-bool feasible (State& s, VectorXd& X, VectorXd& Y) {
+bool feasible (State& s, VectorXd& X, VectorXd& Y, int* totalIters = NULL) {
 
 	if(s.order.empty()) return true;
 
 	X = VectorXd (s.order.size());
 	Y = VectorXd (s.order.size());
-	for(int iter = 0; iter < 1e6; iter++) {
+	for(int iter = 0; iter < 5*1e6; iter++) {
 
 		// Check if the contact constraints can be achieved by (1) checking for x-axis distance between
 		// consecutive gears, (2) computing the y-axis values randomly.
@@ -353,10 +313,67 @@ bool feasible (State& s, VectorXd& X, VectorXd& Y) {
 			Y(X.rows()-1) = p(1);
 		}
 		
+		if(totalIters != NULL) *totalIters = iter;
 		return true;
 	}
 
 	return false;
+}
+
+/* ******************************************************************************************** */
+void heuristic (State& s) {
+
+	int totalIters = 0;
+	VectorXd X, Y;
+	int trials = 10, success = 0;
+	for(int i = 0; i < trials; i++) {
+		int iters;
+		if(feasible(s,X,Y,&iters)) {
+			totalIters += iters;
+			success++;
+		}
+	}
+	s.H = (((double) success) / totalIters);
+}
+
+/* ******************************************************************************************** */
+State* applyAction (const State& s, Action_& a) {
+
+	// printf("\nApplying '%s'\n", a.s().c_str());
+	assert(!s.check && "Should not reach here");
+
+	// Copy state
+	State* s2 = new State;
+	s2->order = s.order;
+	s2->check = s.check;
+	s2->used = s.used;
+	s2->used_sticks = s.used_sticks;
+	
+	// Make the changes
+	if(a.use >= 0) {
+		assert(!s2->used[a.use]);
+		s2->used[a.use] = true;
+		s2->order.push_back(a.use);
+	}
+	else {
+		int gear_id = (-a.use) % 10;
+		int stick_id = (-a.use) / 10;
+		assert(!s2->used[gear_id]);
+		s2->used[gear_id] = true;
+		s2->used_sticks[stick_id] = true;
+		s2->order.push_back(a.use);
+	}
+	if(a.check) s2->check = true;
+		
+	// Compute heuristic
+	switch (H_TYPE) {
+		case 0: heuristic(*s2); break;
+		case 1: s2->H = s.H+1; break;
+		case 2: s2->H = rand(); break;
+	};
+	s2->d = s.d+1;
+
+	return s2;
 }
 
 /* ******************************************************************************************** */
@@ -393,7 +410,7 @@ bool dfs (State* s0) {
 
 		// Get the current state
 		State* s = queue.top();
-		printf("s%d_%d: %s\n", c_, s->d, s->s().c_str());
+		// printf("s%d_%d: %s\n", c_, s->d, s->s().c_str());
 		queue.pop();
 		c_++;
 
@@ -404,7 +421,7 @@ bool dfs (State* s0) {
 		// Check if reached goal
 		if(s->check) {
 			printResult(*s, X,Y);
-			printf("Reached goal!\n");	
+			printf("%d\n", c_);	
 			return true;	
 		}
 
@@ -427,10 +444,14 @@ int main (int argc, char* argv[]) {
 	int bla = rand();
 	printf("random seed: %d\n", bla);
 	srand(bla);
-	if(argc > 1) srand(atoi(argv[1]));
-
+	// if(argc > 1) srand(atoi(argv[1]));
+	if(argc > 1) H_TYPE = atoi(argv[1]);
+	if(argc > 2) objn(0) = maxP(0) = atof(argv[2]);
+	printf("H_TYPE: %d\n", H_TYPE);
+	printf("x dist: %lf\n", objn(0));
+		
 	State s = initialState();
-	printf("S0: %s\n", s.s().c_str());
+	// printf("S0: %s\n", s.s().c_str());
 	//getchar();
 //
 //	vector <Action_> A0;
@@ -472,6 +493,6 @@ int main (int argc, char* argv[]) {
 //	printResult(*s3, X,Y);
 
 	bool res = dfs(&s);
-	if(!res) printf("Failure\n");
+	if(!res) printf("0\n");
 }
 
